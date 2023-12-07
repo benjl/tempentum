@@ -60,7 +60,7 @@ jump_frayb_a4
 jump_future_rebuild
 jump_glassydev_final
 jump_glassydev_rc3
-jump_gman_beta_4
+jump_gman_beta_5_final_rebuild_rc1
 jump_grape_final
 jump_grimace
 jump_hana
@@ -247,7 +247,6 @@ jump_radiix
 jump_sheer_v4
 jump_six_a6
 jump_sonni_a6
-jump_spy101_rc12
 jump_starwars_rc2
 jump_sucks
 jump_the_b7
@@ -268,3 +267,13 @@ jump_shapes_rc2
 jump_spy101_rc4
 jump_timtam_rc2
 jump_insomnia_a8
+jump_achlys
+jump_adam
+jump_azazel
+jump_beryllium_v5
+jump_eu
+jump_iblis
+jump_lilith
+jump_rust_rc3
+conc_concept
+jump_causatham_rc5

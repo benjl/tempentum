@@ -418,7 +418,6 @@ jump_power_rc3
 jump_primal_rc7
 jump_repente_b4
 jump_skyscraper_v2
-jump_spy101_rc12
 jump_starwars_rc2
 jump_sucks
 jump_turnuround_fix
@@ -432,7 +431,6 @@ jump_attached3_final
 jump_avalanche
 jump_beryllium_v4
 jump_boogiewoogie_a29
-jump_causatham_rc5
 jump_desolate_rc6
 jump_ember_rc6
 jump_factory
@@ -456,3 +454,18 @@ jump_vespertine_rc3
 jump_vidarydkling_rc5
 jump_beefster
 jump_sudaca
+jump_a_b3
+jump_alder_rc3
+jump_andromeda
+jump_hopstep2_rc7
+jump_infernum_rc2
+jump_inimica_rc2
+jump_ionizer_tpn4
+jump_laevateinn_final
+jump_ravioliix
+jump_wagyu_a5
+jump_whitescreen_b1
+jump_balls_fix
+jump_confiote_rc1
+jump_froyo_b3
+jump_ravioliix_tpn
