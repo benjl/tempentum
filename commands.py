@@ -3,6 +3,9 @@ import points
 import profiles
 import map_getter
 
+def help(args):
+    print('download all: downloads tempus data from the internet\nupdate: calculate points\nrankall: generate leaderboards file')
+
 def download(args):
     if len(args) == 0:
         print('USAGE: download [map/all] (start)')
@@ -56,6 +59,8 @@ def srank(args):
             if uid not in p.keys():
                 print('Player not found.')
                 return
+            if uid not in p2.keys():
+                p2 = p
             name = p[uid]['name']
             rank = p[uid]['rank']['soldier']
             oldrank = p2[uid]['rank']['soldier']
@@ -116,6 +121,8 @@ def drank(args):
             if uid not in p.keys():
                 print('Player not found.')
                 return
+            if uid not in p2.keys():
+                p2 = p
             name = p[uid]['name']
             rank = p[uid]['rank']['demoman']
             oldrank = p2[uid]['rank']['demoman']
@@ -222,6 +229,82 @@ def lookup(args):
     print('Found players: ')
     for nm in foundnames[:20]:
         print(f'(ID {nm[1]}) {nm[0]}')
+
+def sgroups(args):
+    if len(args) != 1:
+        print('USAGE: sgroups [tempusid]')
+        return
+    p = utils.get_latest_profiles()
+    uid = args[0]
+    if uid not in p.keys():
+        print('Player not found.')
+        return
+    groups = [0, 0, 0, 0, 0, 0, 0] # wr, tt, g1, g2, g3, g4, ng
+    groupspts = [0, 0, 0, 0, 0, 0, 0]
+    groupspct = [0, 0, 0, 0, 0, 0, 0]
+    name = p[uid]['name']
+    for run in p[uid]['runs']['soldier']:
+        r = p[uid]['runs']['soldier'][run]
+        if r['rank'] == 1:
+            groups[0] += 1
+            groupspts[0] += points.points(r['rank'], r['completions'])
+        else:
+            group = points.in_group(r['rank'], r['completions'])
+            if group == -1:
+                groups[6] += 1
+                groupspts[6] += points.points(r['rank'], r['completions'])
+            else:
+                groups[group+1] += 1
+                groupspts[group+1] += points.points(r['rank'], r['completions'])
+    total = sum(groups)
+    for i,x in enumerate(groups):
+        groupspct[i] = round((x/total)*100, 2)
+    print(f"""{name} total soldier runs: {total} ({int(sum(groupspts))} pts)
+    WR: {groups[0]}({groupspct[0]}%)({int(groupspts[0])} pts)
+    TT: {groups[1]}({groupspct[1]}%)({int(groupspts[1])} pts)
+    G1: {groups[2]}({groupspct[2]}%)({int(groupspts[2])} pts)
+    G2: {groups[3]}({groupspct[3]}%)({int(groupspts[3])} pts)
+    G3: {groups[4]}({groupspct[4]}%)({int(groupspts[4])} pts)
+    G4: {groups[5]}({groupspct[5]}%)({int(groupspts[5])} pts)
+    NG: {groups[6]}({groupspct[6]}%)({int(groupspts[6])} pts)""")
+    
+def dgroups(args):
+    if len(args) != 1:
+        print('USAGE: dgroups [tempusid]')
+        return
+    p = utils.get_latest_profiles()
+    uid = args[0]
+    if uid not in p.keys():
+        print('Player not found.')
+        return
+    groups = [0, 0, 0, 0, 0, 0, 0] # wr, tt, g1, g2, g3, g4, ng
+    groupspts = [0, 0, 0, 0, 0, 0, 0]
+    groupspct = [0, 0, 0, 0, 0, 0, 0]
+    name = p[uid]['name']
+    for run in p[uid]['runs']['demoman']:
+        r = p[uid]['runs']['demoman'][run]
+        if r['rank'] == 1:
+            groups[0] += 1
+            groupspts[0] += points.points(r['rank'], r['completions'])
+        else:
+            group = points.in_group(r['rank'], r['completions'])
+            if group == -1:
+                groups[6] += 1
+                groupspts[6] += points.points(r['rank'], r['completions'])
+            else:
+                groups[group+1] += 1
+                groupspts[group+1] += points.points(r['rank'], r['completions'])
+    total = sum(groups)
+    for i,x in enumerate(groups):
+        groupspct[i] = round((x/total)*100, 2)
+    print(f"""{name} total demoman runs: {total} ({int(sum(groupspts))} pts)
+    WR: {groups[0]}({groupspct[0]}%)({int(groupspts[0])} pts)
+    TT: {groups[1]}({groupspct[1]}%)({int(groupspts[1])} pts)
+    G1: {groups[2]}({groupspct[2]}%)({int(groupspts[2])} pts)
+    G2: {groups[3]}({groupspct[3]}%)({int(groupspts[3])} pts)
+    G3: {groups[4]}({groupspct[4]}%)({int(groupspts[4])} pts)
+    G4: {groups[5]}({groupspct[5]}%)({int(groupspts[5])} pts)
+    NG: {groups[6]}({groupspct[6]}%)({int(groupspts[6])} pts)""")
 
 def stime(args, p=None, p2=None, silent=False):
     if len(args) < 2:
@@ -331,20 +414,59 @@ def dtime(args, p=None, p2=None, silent=False):
     
 def dtimeall(args):
     uid = args[0]
-    ml = utils.get_demoman_maps()
+    groupname = None
+    if len(args) > 1:
+        groupname = args[1].lower()
+        name_to_number = {'tt': 0, 'g1': 1, 'g2': 2, 'g3': 3, 'g4': 4, 'ng': -1}
+        if groupname not in name_to_number:
+            print(f'Unknown group "{groupname}"')
+            return
+        groupnumber = name_to_number[groupname]
     p = utils.get_latest_profiles()
+    if uid not in p:
+        print('User id not found.')
+        return
     p2 = utils.get_latest_profiles(x=1)
-    for mn in ml:
-        dtime((uid, mn), p=p, p2=p2, silent=True)
+    for run in p[uid]['runs']['demoman']:
+        r = p[uid]['runs']['demoman'][run]
+        if groupname:
+            if points.in_group(r['rank'], r['completions']) == groupnumber:
+                dtime((uid, run), p=p, p2=p2, silent=True)
+        else:
+            dtime((uid, run), p=p, p2=p2, silent=True)
 
 def stimeall(args):
     uid = args[0]
-    ml = utils.get_soldier_maps()
+    groupname = None
+    if len(args) > 1:
+        groupname = args[1].lower()
+        name_to_number = {'tt': 0, 'g1': 1, 'g2': 2, 'g3': 3, 'g4': 4, 'ng': -1}
+        if groupname not in name_to_number:
+            print(f'Unknown group "{groupname}"')
+            return
+        groupnumber = name_to_number[groupname]
     p = utils.get_latest_profiles()
+    if uid not in p:
+        print('User id not found.')
+        return
     p2 = utils.get_latest_profiles(x=1)
-    for mn in ml:
-        stime((uid, mn), p=p, p2=p2, silent=True)
+    for run in p[uid]['runs']['soldier']:
+        r = p[uid]['runs']['soldier'][run]
+        if groupname:
+            if points.in_group(r['rank'], r['completions']) == groupnumber:
+                stime((uid, run), p=p, p2=p2, silent=True)
+        else:
+            stime((uid, run), p=p, p2=p2, silent=True)
 
+def id(args):
+    if len(args) < 1:
+        print('USAGE: id [playername]')
+        return
+    name = ' '.join(args)
+    p = utils.get_latest_profiles()
+    for id in p:
+        if p[id]['name'].lower().startswith(name.lower()):
+            print(f'{p[id]["name"]}: {id}')
 def update(args):
     print('Updating tempus data...')
     profiles.build_profiles()

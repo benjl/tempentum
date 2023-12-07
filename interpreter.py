@@ -4,7 +4,8 @@ import commands
 COMMANDS = {'download': commands.download, 'srank': commands.srank, 'drank': commands.drank,
             'update': commands.update, 'stime': commands.stime, 'dtime': commands.dtime, 
             'rankall': commands.leaderboards, 'lookup': commands.lookup, 'maplist': commands.maplist,
-            'dtimeall': commands.dtimeall, 'stimeall': commands.stimeall}
+            'dtimeall': commands.dtimeall, 'stimeall': commands.stimeall, 'help': commands.help,
+            'sgroups': commands.sgroups, 'dgroups': commands.dgroups, 'id': commands.id}
 
 if __name__ == '__main__':
     print('Tempentum Point System')
