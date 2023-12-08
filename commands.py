@@ -4,7 +4,111 @@ import profiles
 import map_getter
 
 def help(args):
-    print('download all: downloads tempus data from the internet\nupdate: calculate points\nrankall: generate leaderboards file')
+    print("""download all: downloads tempus data from the internet
+update: calculate points
+rankall: generate leaderboards file""")
+
+def stimes(args):
+    if len(args) == 0:
+        print('USAGE: stimes [map] ((start-)end)')
+        return
+    ml = utils.get_soldier_maps()
+    if args[0] not in ml:
+        print('Map not found.')
+        return
+    data = utils.get_latest_map_data(args[0])
+    start = 1
+    end = 10
+    if len(args) > 1:
+        if '-' in args[1]:
+            if len(args[1].split('-')) != 2:
+                print('USAGE: stimes [map] ((start-)end)/(groupname)')
+                return
+            start,end = args[1].split('-')
+            try:
+                start = int(start)
+                end = int(end)
+            except ValueError:
+                print('USAGE: stimes [map] ((start-)end)/(groupname)')
+                return
+        elif args[1].lower() in ('tt', 'g1', 'g2', 'g3', 'g4', 'ng'):
+            start, end = utils.ranks_in_group(len(data['results']['soldier']), args[1].lower())
+            if start > len(data['results']['soldier']):
+                print(f'No runs in group.')
+                return
+        else:
+            try:
+                end = int(args[1])
+            except ValueError:
+                print('USAGE: stimes [map] ((start-)end)/(groupname)')
+                return
+    start = 1 if start < 1 else start
+    if start > len(data['results']['soldier']):
+        start = len(data['results']['soldier'])
+    if end > len(data['results']['soldier']):
+        end = len(data['results']['soldier'])
+    if end - start > 50:
+        end = start + 50
+    if start > end:
+        print('Error: start rank must be smaller than end rank')
+        return
+    
+    p = utils.get_latest_profiles()
+    for x in range(start-1,end):
+        c = stime([f"{data['results']['soldier'][x]['player_info']['id']}", args[0]], p=p, p2=p, silent=True, raw=True)
+        clipped_name = c['name'][:12]
+        print(f"#{c['rank']:{len(str(end))}}: {clipped_name:13} {c['group_str']} @ {c['time_str']} ({c['comp_group']} +{c['comp_time']}) - {c['points']} points")
+
+def dtimes(args):
+    if len(args) == 0:
+        print('USAGE: dtimes [map] ((start-)end)/(groupname)')
+        return
+    ml = utils.get_demoman_maps()
+    if args[0] not in ml:
+        print('Map not found.')
+        return
+    data = utils.get_latest_map_data(args[0])
+    start = 1
+    end = 10
+    if len(args) > 1:
+        if '-' in args[1]:
+            if len(args[1].split('-')) != 2:
+                print('USAGE: dtimes [map] ((start-)end)/(groupname)')
+                return
+            start,end = args[1].split('-')
+            try:
+                start = int(start)
+                end = int(end)
+            except ValueError:
+                print('USAGE: dtimes [map] ((start-)end)/(groupname)')
+                return
+        elif args[1].lower() in ('tt', 'g1', 'g2', 'g3', 'g4', 'ng'):
+            start, end = utils.ranks_in_group(len(data['results']['demoman']), args[1].lower())
+            if start > len(data['results']['demoman']):
+                print(f'No runs in group.')
+                return
+        else:
+            try:
+                end = int(args[1])
+            except ValueError:
+                print('USAGE: dtimes [map] ((start-)end)/(groupname)')
+                return
+    start = 1 if start < 1 else start
+    if start > len(data['results']['demoman'])+1:
+        start = len(data['results']['demoman'])+1
+    if end > len(data['results']['demoman']):
+        end = len(data['results']['demoman'])
+    if end - start > 50:
+        end = start + 50
+    if start > end:
+        print('Error: start rank must be smaller than end rank')
+        return
+    
+    p = utils.get_latest_profiles()
+    for x in range(start-1,end):
+        c = dtime([f"{data['results']['demoman'][x]['player_info']['id']}", args[0]], p=p, p2=p, silent=True, raw=True)
+        clipped_name = c['name'][:12]
+        print(f"#{c['rank']:{len(str(end))}}: {clipped_name:13} {c['group_str']} @ {c['time_str']} ({c['comp_group']} +{c['comp_time']}) - {c['points']} points")
 
 def download(args):
     if len(args) == 0:
@@ -307,7 +411,9 @@ def dgroups(args):
     G4: {groups[5]}({groupspct[5]}%)({int(groupspts[5])} pts)
     NG: {groups[6]}({groupspct[6]}%)({int(groupspts[6])} pts)""")
 
-def stime(args, p=None, p2=None, silent=False):
+def stime(args, p=None, p2=None, silent=None, raw=None):
+    raw = False if raw is None else raw
+    silent = False if silent is None else silent
     if len(args) < 2:
         print('USAGE: stime [tempusid] [map]')
         return
@@ -362,10 +468,24 @@ def stime(args, p=None, p2=None, silent=False):
         comp_time = utils.tempus_timestring(run['duration'] - md['results']['soldier'][comp_rank - 1]['duration'])
     else:
         comp_time = 0
-
+    if raw:
+        return {
+            'name': name,
+            'mapname': mn,
+            'group_str': group_str,
+            'time_str': time_str,
+            'comp_group': comp_group,
+            'comp_time': comp_time,
+            'rank': rank,
+            'completions': completions,
+            'points': int(pts),
+            'comp_pts': comp_pts 
+        }
     print(f'{name} on {mn}: {group_str} @ {time_str} ({comp_group} +{comp_time}) | {rank}/{completions} | Points: {int(pts)}{comp_pts}')
 
-def dtime(args, p=None, p2=None, silent=False):
+def dtime(args, p=None, p2=None, silent=None, raw=None):
+    raw = False if raw is None else raw
+    silent = False if silent is None else silent
     if len(args) < 2:
         print('USAGE: dtime [tempusid] [map]')
         return
@@ -420,6 +540,19 @@ def dtime(args, p=None, p2=None, silent=False):
         comp_time = utils.tempus_timestring(run['duration'] - md['results']['demoman'][comp_rank - 1]['duration'])
     else:
         comp_time = 0
+    if raw:
+        return {
+            'name': name,
+            'mapname': mn,
+            'group_str': group_str,
+            'time_str': time_str,
+            'comp_group': comp_group,
+            'comp_time': comp_time,
+            'rank': rank,
+            'completions': completions,
+            'points': int(pts),
+            'comp_pts': comp_pts 
+        }
 
     print(f'{name} on {mn}: {group_str} @ {time_str} ({comp_group} +{comp_time}) | {rank}/{completions} | Points: {int(pts)}{comp_pts}')
     

@@ -111,6 +111,21 @@ def get_demoman_maps():
     mapnames = sorted(mapnames)
     return mapnames
 
+def ranks_in_group(completions, group): # group in ['tt', 'g1', 'g2', 'g3', 'g4', 'ng']
+    g = points.groupsizes(completions)
+    if group == 'tt':
+        return (1,10)
+    elif group == 'g1':
+        return (11, 10+g[0])
+    elif group == 'g2':
+        return (10+g[0]+1, 10+g[0]+g[1])
+    elif group == 'g3':
+        return (10+g[0]+g[1]+1, 10+g[0]+g[1]+g[2])
+    elif group == 'g4':
+        return (10+g[0]+g[1]+g[2]+1, 10+g[0]+g[1]+g[2]+g[3])
+    elif group == 'ng':
+        return (10+g[0]+g[1]+g[2]+g[3]+1, 1000000)
+
 # Return the last place in the group above the given time and the group name
 def get_group_trail(rank, completions):
     groups = points.groupsizes(completions)
