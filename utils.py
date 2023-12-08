@@ -60,13 +60,14 @@ def get_latest_map_data(mapname, x=0):
         mapdata = json.load(f)
     return mapdata
 
-def get_latest_profiles(x=0):
+def get_latest_profiles(x=None):
+    x = 0 if x is None else x
     filelist = os.listdir('internal/profiles/')
     if len(filelist) == 0:
         print(f'WARNING: No profile data.')
         return None
     if x > len(filelist) - 1:
-        return None
+        x = len(filelist) - 1
     times = []
     for f in filelist:
         times.append(time.strptime(f.strip('.json'), '%Y-%m-%d'))
@@ -82,6 +83,7 @@ def get_latest_profile_date(x=0):
         print(f'WARNING: No profile data.')
         return None
     if x > len(filelist) - 1:
+        print('WARNING: Cannot find previous profile data.')
         return None
     times = []
     for f in filelist:

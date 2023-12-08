@@ -60,7 +60,7 @@ jump_frayb_a4
 jump_future_rebuild
 jump_glassydev_final
 jump_glassydev_rc3
-jump_gman_beta_5_final_rebuild_rc1
+jump_gman_beta5_final_rebuild_rc1
 jump_grape_final
 jump_grimace
 jump_hana

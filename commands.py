@@ -166,7 +166,8 @@ def leaderboards(args):
         pids = sorted(pids, key=lambda x: p[x]['rank'][classname])
         with open(f'{classname}_ranks/{cur_date}.txt', 'w', encoding='utf-8') as f:
             changedate = utils.get_latest_profile_date(x=1)
-            f.write(cur_date + ' (Change since ' + changedate + ')' + '\n')
+            if changedate is not None:
+                f.write(cur_date + ' (Change since ' + changedate + ')' + '\n')
             for pid in pids:
                 rank = p[pid]['rank'][classname]
                 # Don't include unranked people
@@ -314,6 +315,8 @@ def stime(args, p=None, p2=None, silent=False):
         p = utils.get_latest_profiles()
     if p2 is None:
         p2 = utils.get_latest_profiles(x=1)
+    if p2 is None:
+        p2 = p
     uid = args[0]
     mn = args[1].lower()
     if uid not in p.keys():
@@ -355,7 +358,10 @@ def stime(args, p=None, p2=None, silent=False):
     # Next group up split comparison
     comp_rank, comp_group = utils.get_group_trail(rank, completions)
     md = utils.get_latest_map_data(mn, x=0)
-    comp_time = utils.tempus_timestring(run['duration'] - md['results']['soldier'][comp_rank - 1]['duration'])
+    if md is not None:
+        comp_time = utils.tempus_timestring(run['duration'] - md['results']['soldier'][comp_rank - 1]['duration'])
+    else:
+        comp_time = 0
 
     print(f'{name} on {mn}: {group_str} @ {time_str} ({comp_group} +{comp_time}) | {rank}/{completions} | Points: {int(pts)}{comp_pts}')
 
@@ -367,6 +373,8 @@ def dtime(args, p=None, p2=None, silent=False):
         p = utils.get_latest_profiles()
     if p2 is None:
         p2 = utils.get_latest_profiles(x=1)
+    if p2 is None:
+        p2 = p
     uid = args[0]
     mn = args[1].lower()
     if uid not in p.keys():
@@ -408,7 +416,10 @@ def dtime(args, p=None, p2=None, silent=False):
     # Next group up split comparison
     comp_rank, comp_group = utils.get_group_trail(rank, completions)
     md = utils.get_latest_map_data(mn, x=0)
-    comp_time = utils.tempus_timestring(run['duration'] - md['results']['demoman'][comp_rank - 1]['duration'])
+    if md is not None:
+        comp_time = utils.tempus_timestring(run['duration'] - md['results']['demoman'][comp_rank - 1]['duration'])
+    else:
+        comp_time = 0
 
     print(f'{name} on {mn}: {group_str} @ {time_str} ({comp_group} +{comp_time}) | {rank}/{completions} | Points: {int(pts)}{comp_pts}')
     

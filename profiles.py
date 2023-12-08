@@ -15,6 +15,8 @@ def build_profiles():
     # First we go through each run on each map and add it to the person's profile
     for mn in maplist:
         data = utils.get_latest_map_data(mn)
+        if data is None:
+            continue
         for classname in ('demoman', 'soldier'):
             if classname == 'demoman' and mn not in d_maps:
                 continue
