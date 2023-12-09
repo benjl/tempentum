@@ -435,8 +435,10 @@ def stime(args, p=None, p2=None, silent=None, raw=None):
         return
     if uid not in p2.keys():
         p2 = p
+    new_completion = False
     if mn not in p2[uid]['runs']['soldier'].keys():
         p2 = p
+        new_completion = True
     
     # Get run information
     name = p[uid]['name']
@@ -453,7 +455,8 @@ def stime(args, p=None, p2=None, silent=None, raw=None):
     old_rank = old_run['rank']
     old_completions = old_run['completions']
     old_pts = points.points(old_rank, old_completions)
-    
+    if new_completion:
+        old_pts = 0
     comp_pts = ' ('
     if pts - old_pts > 0: 
         comp_pts += '+'
@@ -507,9 +510,10 @@ def dtime(args, p=None, p2=None, silent=None, raw=None):
         return
     if uid not in p2.keys():
         p2 = p
+    new_completion = False
     if mn not in p2[uid]['runs']['demoman'].keys():
         p2 = p
-    
+        new_completion = True
     # Get run information
     name = p[uid]['name']
     run = p[uid]['runs']['demoman'][mn]
@@ -525,7 +529,8 @@ def dtime(args, p=None, p2=None, silent=None, raw=None):
     old_rank = old_run['rank']
     old_completions = old_run['completions']
     old_pts = points.points(old_rank, old_completions)
-    
+    if new_completion:
+        old_pts = 0
     comp_pts = ' ('
     if pts - old_pts > 0: 
         comp_pts += '+'
