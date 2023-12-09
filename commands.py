@@ -324,27 +324,71 @@ def leaderboards(args):
                 else:
                     f.write(f'{rank}. {name}: {int(points)} points ({points_delta_string}) {rank_delta_string}\n')
 
-def lookup(args):
-    name = ' '.join(args).lower()
-    p = utils.get_latest_profiles()
-    
-    foundnames = []
-    for plr in p.keys():
-        if name in p[plr]['name'].lower():
-            pts = 0
-            pts += p[plr]['points']['soldier']
-            pts += p[plr]['points']['demoman']
-            foundnames.append((p[plr]['name'], plr, pts))
-    
-    if len(foundnames) == 0:
-        print(f'No matches found for {name}')
-        return
-    
-    foundnames = sorted(foundnames, key=lambda x: x[2], reverse=True)
-    
-    print('Found players: ')
-    for nm in foundnames[:20]:
-        print(f'(ID {nm[1]}) {nm[0]}')
+def pts(args):
+    if len(args) == 0:
+        p = utils.get_latest_profiles()
+        p2 = utils.get_latest_profiles(x=1)
+        if p2 is None:
+            p2 = p
+        spoints = 0
+        dpoints = 0
+        spoints2 = 0
+        dpoints2 = 0
+        for plr in p.keys():
+            spoints += p[plr]['points']['soldier']
+            dpoints += p[plr]['points']['demoman']
+        for plr in p2.keys():
+            spoints2 += p2[plr]['points']['soldier']
+            dpoints2 += p2[plr]['points']['demoman']
+        sdif = int(spoints - spoints2)
+        ddif = int(dpoints - dpoints2)
+        print(f'Total soldier points: {int(spoints)} (+{sdif})\nTotal demoman points: {int(dpoints)} (+{ddif})')
+    else:
+        mn = utils.find_map(args[0])
+        if mn is None:
+            print('Map not found.')
+            return
+        if mn in utils.get_soldier_maps():
+            spoints = 0
+            spoints2 = 0
+            data = utils.get_latest_map_data(mn)
+            data2 = utils.get_latest_map_data(mn, x=1)
+            if data2 is None:
+                data2 = data
+            completions = len(data['results']['soldier'])
+            completions2 = len(data2['results']['soldier'])
+            for rank, run in enumerate(data['results']['soldier'], start=1):
+                spoints += points.points(rank, completions)
+            for rank, run in enumerate(data2['results']['soldier'], start=1):
+                spoints2 += points.points(rank, completions2)
+            sdif = int(spoints - spoints2)
+            sign = ''
+            if sdif > 0:
+                sign = '+'
+            elif sdif < 0:
+                sign = '-'
+            print(f'Total soldier points on {mn}: {int(spoints)}({sign}{abs(sdif)})')
+        if mn in utils.get_demoman_maps():
+            dpoints = 0
+            dpoints2 = 0
+            data = utils.get_latest_map_data(mn)
+            data2 = utils.get_latest_map_data(mn, x=1)
+            if data2 is None:
+                data2 = data
+            completions = len(data['results']['demoman'])
+            completions2 = len(data2['results']['demoman'])
+            for rank, run in enumerate(data['results']['demoman'], start=1):
+                dpoints += points.points(rank, completions)
+            for rank, run in enumerate(data2['results']['demoman'], start=1):
+                dpoints2 += points.points(rank, completions2)
+            ddif = int(dpoints - dpoints2)
+            sign = ''
+            if ddif > 0:
+                sign = '+'
+            elif ddif < 0:
+                sign = '-'
+            print(f'Total demoman points on {mn}: {int(dpoints)}({sign}{abs(ddif)})')
+
 
 def sgroups(args):
     if len(args) != 1:

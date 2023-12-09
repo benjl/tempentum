@@ -3,7 +3,7 @@ import commands
 
 COMMANDS = {'download': commands.download, 'srank': commands.srank, 'drank': commands.drank,
             'update': commands.update, 'stime': commands.stime, 'dtime': commands.dtime, 
-            'rankall': commands.leaderboards, 'lookup': commands.lookup, 'maplist': commands.maplist,
+            'rankall': commands.leaderboards, 'points': commands.pts, 'maplist': commands.maplist,
             'dtimeall': commands.dtimeall, 'stimeall': commands.stimeall, 'help': commands.help,
             'sgroups': commands.sgroups, 'dgroups': commands.dgroups, 'id': commands.id,
             'stimes': commands.stimes, 'dtimes': commands.dtimes}
