@@ -28,7 +28,7 @@ def build_profiles():
                 id = run['user_id']
                 if id not in profiles:
                     profiles[id] = {}
-                    profiles[id]['name'] = run['name']
+                    profiles[id]['name'] = run['name'].replace('\n',' ')
                     profiles[id]['rank'] = {'soldier': -1, 'demoman': -1}
                     profiles[id]['points'] = {'soldier': 0, 'demoman': 0}
                     profiles[id]['runs'] = {'soldier': {}, 'demoman': {}}
