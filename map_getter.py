@@ -38,14 +38,17 @@ def download_all_maps(idx=0):
     failed = []
     d_maps = utils.get_demoman_maps()
     s_maps = utils.get_soldier_maps()
-    
     for i, mn in enumerate(maplist[idx:], start=idx+1):
-        status = download_map(mn, silent=True)
-        if not status:
-            failed.append(mn)
-            print(f'{i}/{mapcount} Maps Downloaded (FAILED)')
-        else:
-            print(f'{i}/{mapcount} Maps Downloaded ({mn})')
+        try:
+            status = download_map(mn, silent=True)
+            if not status:
+                failed.append(mn)
+                print(f'{i}/{mapcount} Maps Downloaded (FAILED)')
+            else:
+                print(f'{i}/{mapcount} Maps Downloaded ({mn})')
+        except KeyboardInterrupt:
+            print('Map downloads interrupted.')
+            break
     
     if len(failed) > 0:
         print(f'WARNING: These maps failed to download: {", ".join(failed)}.')
