@@ -12,11 +12,14 @@ def stimes(args):
     if len(args) == 0:
         print('USAGE: stimes [map] ((start-)end)')
         return
-    ml = utils.get_soldier_maps()
-    if args[0] not in ml:
+    mn = utils.find_map(args[0])
+    if mn is None:
         print('Map not found.')
         return
-    data = utils.get_latest_map_data(args[0])
+    if mn not in utils.get_soldier_maps():
+        print(f'{mn} is not a soldier map.')
+        return
+    data = utils.get_latest_map_data(mn)
     start = 1
     end = 10
     if len(args) > 1:
@@ -52,10 +55,10 @@ def stimes(args):
     if start > end:
         print('Error: start rank must be smaller than end rank')
         return
-    
+    print(f'Runs #{start}-{end} on {mn}:')
     p = utils.get_latest_profiles()
     for x in range(start-1,end):
-        c = stime([f"{data['results']['soldier'][x]['player_info']['id']}", args[0]], p=p, p2=p, silent=True, raw=True)
+        c = stime([f"{data['results']['soldier'][x]['player_info']['id']}", mn], p=p, p2=p, silent=True, raw=True)
         clipped_name = c['name'][:12]
         print(f"#{c['rank']:{len(str(end))}}: {clipped_name:13} {c['group_str']} @ {c['time_str']} ({c['comp_group']} +{c['comp_time']}) - {c['points']} points")
 
@@ -63,11 +66,14 @@ def dtimes(args):
     if len(args) == 0:
         print('USAGE: dtimes [map] ((start-)end)/(groupname)')
         return
-    ml = utils.get_demoman_maps()
-    if args[0] not in ml:
+    mn = utils.find_map(args[0])
+    if mn is None:
         print('Map not found.')
         return
-    data = utils.get_latest_map_data(args[0])
+    if mn not in utils.get_demoman_maps():
+        print(f'{mn} is not a demoman map.')
+        return
+    data = utils.get_latest_map_data(mn)
     start = 1
     end = 10
     if len(args) > 1:
@@ -103,10 +109,10 @@ def dtimes(args):
     if start > end:
         print('Error: start rank must be smaller than end rank')
         return
-    
+    print(f'Runs #{start}-{end} on {mn}:')
     p = utils.get_latest_profiles()
     for x in range(start-1,end):
-        c = dtime([f"{data['results']['demoman'][x]['player_info']['id']}", args[0]], p=p, p2=p, silent=True, raw=True)
+        c = dtime([f"{data['results']['demoman'][x]['player_info']['id']}", mn], p=p, p2=p, silent=True, raw=True)
         clipped_name = c['name'][:12]
         print(f"#{c['rank']:{len(str(end))}}: {clipped_name:13} {c['group_str']} @ {c['time_str']} ({c['comp_group']} +{c['comp_time']}) - {c['points']} points")
 
@@ -126,6 +132,11 @@ def download(args):
                     start_idx = 0
             map_getter.download_all_maps(idx=start_idx)
         else:
+            maplist(args)
+            mn = utils.find_map(mn)
+            if mn is None:
+                print('Map not found.')
+                return
             map_getter.download_map(mn)
         
 def maplist(args):
@@ -424,7 +435,7 @@ def stime(args, p=None, p2=None, silent=None, raw=None):
     if p2 is None:
         p2 = p
     uid = args[0]
-    mn = args[1].lower()
+    mn = utils.find_map(args[1])
     if uid not in p.keys():
         if not silent:
             print('Player not found.')
@@ -499,7 +510,7 @@ def dtime(args, p=None, p2=None, silent=None, raw=None):
     if p2 is None:
         p2 = p
     uid = args[0]
-    mn = args[1].lower()
+    mn = utils.find_map(args[1])
     if uid not in p.keys():
         if not silent:
             print('Player not found.')

@@ -28,6 +28,15 @@ def load_maplist():
     
     return maplist
 
+def find_map(query):
+    ml = load_maplist()
+    for m in ml:
+        if query.lower() in m.lower():
+            return m
+    else:
+        return None
+
+
 # Formats a duration, in seconts to the tempus duration format hh:mm:ss.00
 def tempus_timestring(duration):
     if duration >= 3600:
