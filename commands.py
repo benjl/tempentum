@@ -631,13 +631,22 @@ def dtimeall(args):
         print('User id not found.')
         return
     p2 = utils.get_latest_profiles(x=1)
+    print(f'Showing demoman times for {p[uid]["name"]}:')
     for run in p[uid]['runs']['demoman']:
         r = p[uid]['runs']['demoman'][run]
         if groupname:
             if points.in_group(r['rank'], r['completions']) == groupnumber:
-                dtime((uid, run), p=p, p2=p2, silent=True)
+                d = dtime((uid, run), p=p, p2=p2, silent=True, raw=True)
+                group_time_comp = f"{d['group_str']} @ {d['time_str']} ({d['comp_group']} +{d['comp_time']})"
+                rank_str = f"{d['rank']}/{d['completions']}"
+                print(f"{d['mapname'][:20]:20} | {group_time_comp:32} | {rank_str:9} | Points: {d['points']}{d['comp_pts']}")
+
         else:
-            dtime((uid, run), p=p, p2=p2, silent=True)
+            d = dtime((uid, run), p=p, p2=p2, silent=True, raw=True)
+            group_time_comp = f"{d['group_str']} @ {d['time_str']} ({d['comp_group']} +{d['comp_time']})"
+            rank_str = f"{d['rank']}/{d['completions']}"
+            print(f"{d['mapname'][:20]:20} | {group_time_comp:32} | {rank_str:9} | Points: {d['points']}{d['comp_pts']}")
+
 
 def stimeall(args):
     uid = args[0]
@@ -654,13 +663,21 @@ def stimeall(args):
         print('User id not found.')
         return
     p2 = utils.get_latest_profiles(x=1)
+    print(f'Showing soldier times for {p[uid]["name"]}:')
     for run in p[uid]['runs']['soldier']:
         r = p[uid]['runs']['soldier'][run]
         if groupname:
             if points.in_group(r['rank'], r['completions']) == groupnumber:
-                stime((uid, run), p=p, p2=p2, silent=True)
+                d = stime((uid, run), p=p, p2=p2, silent=True, raw=True)
+                group_time_comp = f"{d['group_str']} @ {d['time_str']} ({d['comp_group']} +{d['comp_time']})"
+                rank_str = f"{d['rank']}/{d['completions']}"
+                print(f"{d['mapname'][:20]:20} | {group_time_comp:32} | {rank_str:9} | Points: {d['points']}{d['comp_pts']}")
         else:
-            stime((uid, run), p=p, p2=p2, silent=True)
+            d = stime((uid, run), p=p, p2=p2, silent=True, raw=True)
+            group_time_comp = f"{d['group_str']} @ {d['time_str']} ({d['comp_group']} +{d['comp_time']})"
+            rank_str = f"{d['rank']}/{d['completions']}"
+            print(f"{d['mapname'][:20]:20} | {group_time_comp:32} | {rank_str:9} | Points: {d['points']}{d['comp_pts']}")
+
 
 def id(args):
     if len(args) < 1:
