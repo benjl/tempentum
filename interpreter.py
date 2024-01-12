@@ -6,7 +6,8 @@ COMMANDS = {'download': commands.download, 'srank': commands.srank, 'drank': com
             'rankall': commands.leaderboards, 'points': commands.pts, 'maplist': commands.maplist,
             'dtimeall': commands.dtimeall, 'stimeall': commands.stimeall, 'help': commands.help,
             'sgroups': commands.sgroups, 'dgroups': commands.dgroups, 'id': commands.id,
-            'stimes': commands.stimes, 'dtimes': commands.dtimes}
+            'stimes': commands.stimes, 'dtimes': commands.dtimes, 'sgainers': commands.sgainers,
+            'dgainers': commands.dgainers}
 
 if __name__ == '__main__':
     print('Tempentum Point System')

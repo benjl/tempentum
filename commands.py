@@ -268,6 +268,134 @@ def drank(args):
         
         print(f'{name}: Rank {rank} demoman{rankdelta_string} | {int(pts)} points {pointsdelta_string}')
 
+def dgainers(args):
+    if len(args) == 0:
+        n = 10
+    else:
+        try:
+            n = min(20, int(args[0]))
+        except ValueError:
+            print('Invalid argument.')
+            return
+        if n < 1:
+            print('n must be more than 0.')
+            return
+    p = utils.get_latest_profiles()
+    p2 = utils.get_latest_profiles(x=1)
+    if p2 is None:
+        print('No gains found.')
+        return
+    changedate = utils.get_latest_profile_date(x=1)
+    gainers = {}
+    
+    for pid in p.keys():
+        rank = p[pid]['rank']['demoman']
+        if rank == -1:
+            continue
+        points = p[pid]['points']['demoman']
+        if pid not in p2.keys():
+            oldpoints = 0
+            oldrank = rank
+        else:
+            oldpoints = p2[pid]['points']['demoman']
+            oldrank = p2[pid]['rank']['demoman']
+            if oldrank == -1:
+                oldrank = rank
+        gainers[pid] = {'pts_delta': int(points - oldpoints), 'rank_delta': rank - oldrank}
+    pids = gainers.keys()
+    pids = sorted(pids, key=lambda x: gainers[x]['pts_delta'])[::-1]
+    for pid in pids[:n+1]:
+        name = p[pid]['name']
+        rank = p[pid]['rank']['demoman']
+        points = p[pid]['points']['demoman']
+
+        points_delta = gainers[pid]['pts_delta']
+        points_delta_string = ''
+        if points_delta > 0:
+            points_delta_string += '+'
+
+        points_delta_string += str(points_delta)
+
+        rank_delta = gainers[pid]['rank_delta']
+        rank_delta_string = ''
+        if rank_delta > 0:
+            rank_delta_string += '↓'
+        elif rank_delta < 0:
+            rank_delta_string += '↑'
+        rank_delta_string += str(abs(rank_delta))
+
+        if rank_delta == 0:
+            rank_delta_string = ''
+
+        if points_delta == 0:
+            print(f'{name}: Rank {rank} demoman | {int(points)} points {rank_delta_string}')
+        else:
+            print(f'{name}: Rank {rank} demoman {rank_delta_string} | {int(points)} points ({points_delta_string})')
+
+def sgainers(args):
+    if len(args) == 0:
+        n = 10
+    else:
+        try:
+            n = min(20, int(args[0]))
+        except ValueError:
+            print('Invalid argument.')
+            return
+        if n < 1:
+            print('n must be more than 0.')
+            return
+    p = utils.get_latest_profiles()
+    p2 = utils.get_latest_profiles(x=1)
+    if p2 is None:
+        print('No gains found.')
+        return
+    changedate = utils.get_latest_profile_date(x=1)
+    gainers = {}
+    
+    for pid in p.keys():
+        rank = p[pid]['rank']['soldier']
+        if rank == -1:
+            continue
+        points = p[pid]['points']['soldier']
+        if pid not in p2.keys():
+            oldpoints = 0
+            oldrank = rank
+        else:
+            oldpoints = p2[pid]['points']['soldier']
+            oldrank = p2[pid]['rank']['soldier']
+            if oldrank == -1:
+                oldrank = rank
+        gainers[pid] = {'pts_delta': int(points - oldpoints), 'rank_delta': rank - oldrank}
+    pids = gainers.keys()
+    pids = sorted(pids, key=lambda x: gainers[x]['pts_delta'])[::-1]
+    for pid in pids[:n+1]:
+        name = p[pid]['name']
+        rank = p[pid]['rank']['soldier']
+        points = p[pid]['points']['soldier']
+
+        points_delta = gainers[pid]['pts_delta']
+        points_delta_string = ''
+        if points_delta > 0:
+            points_delta_string += '+'
+
+        points_delta_string += str(points_delta)
+
+        rank_delta = gainers[pid]['rank_delta']
+        rank_delta_string = ''
+        if rank_delta > 0:
+            rank_delta_string += '↓'
+        elif rank_delta < 0:
+            rank_delta_string += '↑'
+        rank_delta_string += str(abs(rank_delta))
+
+        if rank_delta == 0:
+            rank_delta_string = ''
+
+        if points_delta == 0:
+            print(f'{name}: Rank {rank} soldier | {int(points)} points {rank_delta_string}')
+        else:
+            print(f'{name}: Rank {rank} soldier {rank_delta_string} | {int(points)} points ({points_delta_string})')
+
 def leaderboards(args):
     print('Generating leaderboards...')
     cur_date = utils.get_current_date()
