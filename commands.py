@@ -193,27 +193,11 @@ def srank(args):
             oldpts = p2[uid]['points']['soldier']
 
         rankdelta = rank - oldrank
-        rankdelta_string = ' '
-        if rankdelta > 0:
-            rankdelta_string += '(↓'
-        elif rankdelta < 0:
-            rankdelta_string += '(↑'
-        if rankdelta == 0:
-            rankdelta_string = ''
-        else:
-            rankdelta_string += str(abs(rankdelta)) + ')'
-        
+        rankdelta_string = ' ' + utils.rank_delta_string(rankdelta, brackets=True)
+
         pointsdelta = pts - oldpts
-        pointsdelta_string = ''
-        if pointsdelta > 0:
-            pointsdelta_string += '(+'
-        elif pointsdelta < 0:
-            pointsdelta_string += '('
-        if pointsdelta == 0:
-            pointsdelta_string = ''
-        else:
-            pointsdelta_string += str(int(pointsdelta)) + ')'
-        
+        pointsdelta_string = utils.points_delta_string(pointsdelta, brackets=True)
+
         print(f'{name}: Rank {rank} soldier{rankdelta_string} | {int(pts)} points {pointsdelta_string}')
 
 def drank(args):
@@ -258,43 +242,42 @@ def drank(args):
             oldpts = p2[uid]['points']['demoman']
 
         rankdelta = rank - oldrank
-        rankdelta_string = ' '
-        if rankdelta > 0:
-            rankdelta_string += '(↓'
-        elif rankdelta < 0:
-            rankdelta_string += '(↑'
-        if rankdelta == 0:
-            rankdelta_string = ''
-        else:
-            rankdelta_string += str(abs(rankdelta)) + ')'
+        rankdelta_string = ' ' + utils.rank_delta_string(rankdelta, brackets=True)
 
         pointsdelta = pts - oldpts
-        pointsdelta_string = ''
-        if pointsdelta > 0:
-            pointsdelta_string += '(+'
-        elif pointsdelta < 0:
-            pointsdelta_string += '('
-        if pointsdelta == 0:
-            pointsdelta_string = ''
-        else:
-            pointsdelta_string += str(int(pointsdelta)) + ')'
+        pointsdelta_string = utils.points_delta_string(pointsdelta, brackets=True)
 
         print(f'{name}: Rank {rank} demoman{rankdelta_string} | {int(pts)} points {pointsdelta_string}')
 
 def dgainers(args):
-    """dgainers (n) | Shows the top n players by demoman points gained since last update. Defaults to 10 if n is omitted."""
-
+    """dgainers (n/losers) | Shows the top n players by demoman points gained. Defaults to 10 if n is omitted.
+    dgainers losers (n) | Show the top 10 losers instead."""
+    losers = False
     if len(args) == 0:
         n = 10
     else:
-        try:
-            n = min(20, int(args[0]))
-        except ValueError:
-            print('Invalid argument.')
-            return
-        if n < 1:
-            print('n must be more than 0.')
-            return
+        if args[0].lower() == 'losers':
+            losers = True
+            if len(args) > 1:
+                try:
+                    n = min(50, int(args[1]))
+                except ValueError:
+                    print('Invalid argument.')
+                    return
+                if n < 1:
+                    print('n must be more than 0.')
+                    return
+            else:
+                n = 10
+        else:
+            try:
+                n = min(50, int(args[0]))
+            except ValueError:
+                print('Invalid argument.')
+                return
+            if n < 1:
+                print('n must be more than 0.')
+                return
     p = utils.get_latest_profiles()
     p2 = utils.get_latest_profiles(x=1)
     if p2 is None:
@@ -302,7 +285,7 @@ def dgainers(args):
         return
     changedate = utils.get_latest_profile_date(x=1)
     gainers = {}
-    
+
     for pid in p.keys():
         rank = p[pid]['rank']['demoman']
         if rank == -1:
@@ -318,48 +301,57 @@ def dgainers(args):
                 oldrank = rank
         gainers[pid] = {'pts_delta': int(points - oldpoints), 'rank_delta': rank - oldrank}
     pids = gainers.keys()
-    pids = sorted(pids, key=lambda x: gainers[x]['pts_delta'])[::-1]
-    for pid in pids[:n+1]:
+    pids = sorted(pids, key=lambda x: gainers[x]['pts_delta'])
+    what = 'losers'
+    if not losers:
+        pids = pids[::-1]
+        what = 'gainers'
+    print(f'Top demoman {what} since {utils.get_latest_profile_date(x=1)}:')
+    for i, pid in enumerate(pids[:n], start=1):
         name = p[pid]['name']
         rank = p[pid]['rank']['demoman']
         points = p[pid]['points']['demoman']
 
         points_delta = gainers[pid]['pts_delta']
-        points_delta_string = ''
-        if points_delta > 0:
-            points_delta_string += '+'
-
-        points_delta_string += str(points_delta)
+        points_delta_string = utils.points_delta_string(points_delta, brackets=True)
 
         rank_delta = gainers[pid]['rank_delta']
-        rank_delta_string = ''
-        if rank_delta > 0:
-            rank_delta_string += '↓'
-        elif rank_delta < 0:
-            rank_delta_string += '↑'
-        rank_delta_string += str(abs(rank_delta))
+        rank_delta_string = ' ' + utils.rank_delta_string(rank_delta, brackets=True)
 
-        if rank_delta == 0:
-            rank_delta_string = ''
+        rank_str = f'Rank {rank}{rank_delta_string}'
+        gainer_rank = f'{i}.'
 
-        if points_delta == 0:
-            print(f'{name}: Rank {rank} demoman | {int(points)} points {rank_delta_string}')
-        else:
-            print(f'{name}: Rank {rank} demoman {rank_delta_string} | {int(points)} points ({points_delta_string})')
+        print(f'{gainer_rank:{len(str(n))+2}}{name[:16]:16}| {rank_str:16} | {int(points):6} points {points_delta_string}')
 
 def sgainers(args):
-    """sgainers (n) | Shows the top n players by soldier points gained since last update. Defaults to 10 if n is omitted."""
+    """sgainers (n) | Shows the top n players by soldier points gained. Defaults to 10 if n is omitted.
+    sgainers losers (n) | Show the top n losers instead."""
+    losers = False
     if len(args) == 0:
         n = 10
     else:
-        try:
-            n = min(20, int(args[0]))
-        except ValueError:
-            print('Invalid argument.')
-            return
-        if n < 1:
-            print('n must be more than 0.')
-            return
+        if args[0].lower() == 'losers':
+            losers = True
+            if len(args) > 1:
+                try:
+                    n = min(50, int(args[1]))
+                except ValueError:
+                    print('Invalid argument.')
+                    return
+                if n < 1:
+                    print('n must be more than 0.')
+                    return
+            else:
+                n = 10
+        else:
+            try:
+                n = min(50, int(args[0]))
+            except ValueError:
+                print('Invalid argument.')
+                return
+            if n < 1:
+                print('n must be more than 0.')
+                return
     p = utils.get_latest_profiles()
     p2 = utils.get_latest_profiles(x=1)
     if p2 is None:
@@ -367,7 +359,7 @@ def sgainers(args):
         return
     changedate = utils.get_latest_profile_date(x=1)
     gainers = {}
-    
+
     for pid in p.keys():
         rank = p[pid]['rank']['soldier']
         if rank == -1:
@@ -383,34 +375,27 @@ def sgainers(args):
                 oldrank = rank
         gainers[pid] = {'pts_delta': int(points - oldpoints), 'rank_delta': rank - oldrank}
     pids = gainers.keys()
-    pids = sorted(pids, key=lambda x: gainers[x]['pts_delta'])[::-1]
-    for pid in pids[:n+1]:
+    pids = sorted(pids, key=lambda x: gainers[x]['pts_delta'])
+    what = 'losers'
+    if not losers:
+        pids = pids[::-1]
+        what = 'gainers'
+    print(f'Top soldier {what} since {utils.get_latest_profile_date(x=1)}:')
+    for i, pid in enumerate(pids[:n], start=1):
         name = p[pid]['name']
         rank = p[pid]['rank']['soldier']
         points = p[pid]['points']['soldier']
 
         points_delta = gainers[pid]['pts_delta']
-        points_delta_string = ''
-        if points_delta > 0:
-            points_delta_string += '+'
-
-        points_delta_string += str(points_delta)
+        points_delta_string = utils.points_delta_string(points_delta, brackets=True)
 
         rank_delta = gainers[pid]['rank_delta']
-        rank_delta_string = ''
-        if rank_delta > 0:
-            rank_delta_string += '↓'
-        elif rank_delta < 0:
-            rank_delta_string += '↑'
-        rank_delta_string += str(abs(rank_delta))
+        rank_delta_string = utils.rank_delta_string(rank_delta, brackets=True)
 
-        if rank_delta == 0:
-            rank_delta_string = ''
+        rank_str = f'Rank {rank}{rank_delta_string}'
+        gainer_rank = f'{i}.'
 
-        if points_delta == 0:
-            print(f'{name}: Rank {rank} soldier | {int(points)} points {rank_delta_string}')
-        else:
-            print(f'{name}: Rank {rank} soldier {rank_delta_string} | {int(points)} points ({points_delta_string})')
+        print(f'{gainer_rank:{len(str(n))+2}}{name[:16]:16}| {rank_str:16} | {int(points):6} points {points_delta_string}')
 
 def leaderboards(args):
     """leaderboards | Outputs the complete leaderboards for soldier and demoman to txt files in the soldier_ranks and demoman_ranks folders."""
@@ -446,28 +431,14 @@ def leaderboards(args):
                 
                 # Points change from last fetch
                 points_delta = int(points - oldpoints)
-                points_delta_string = ''
-                if points_delta > 0:
-                    points_delta_string += '+'
-                    
-                points_delta_string += str(points_delta)
-                
-                rank_delta = int(rank - oldrank)
-                rank_delta_string = ''
-                if rank_delta > 0:
-                    rank_delta_string += '↓'
-                elif rank_delta < 0:
-                    rank_delta_string += '↑'
-                    
-                rank_delta_string += str(abs(rank_delta))
-                
-                if rank_delta == 0:
-                    rank_delta_string = ''
-                
+                points_delta_string = utils.points_delta_string(points_delta, brackets=True) + ' '
                 if points_delta == 0:
-                    f.write(f'{rank}. {name}: {int(points)} points {rank_delta_string}\n')
-                else:
-                    f.write(f'{rank}. {name}: {int(points)} points ({points_delta_string}) {rank_delta_string}\n')
+                    points_delta_string = ''
+
+                rank_delta = int(rank - oldrank)
+                rank_delta_string = utils.rank_delta_string(rank_delta, brackets=False)
+                
+                f.write(f'{rank}. {name}: {int(points)} points {points_delta_string}{rank_delta_string}\n')
 
 def pts(args):
     """pts (mapname) | Displays the total number of points that have been earned on a given map, or all maps combined if mapname is omitted."""
@@ -508,12 +479,8 @@ def pts(args):
             for rank, run in enumerate(data2['results']['soldier'], start=1):
                 spoints2 += points.points(rank, completions2)
             sdif = int(spoints - spoints2)
-            sign = ''
-            if sdif > 0:
-                sign = '+'
-            elif sdif < 0:
-                sign = '-'
-            print(f'Total soldier points on {mn}: {int(spoints)}({sign}{abs(sdif)})')
+            diff_string = utils.points_delta_string(sdif, brackets=True)
+            print(f'Total soldier points on {mn}: {int(spoints)} {diff_string}')
         if mn in utils.get_demoman_maps():
             dpoints = 0
             dpoints2 = 0
@@ -528,12 +495,8 @@ def pts(args):
             for rank, run in enumerate(data2['results']['demoman'], start=1):
                 dpoints2 += points.points(rank, completions2)
             ddif = int(dpoints - dpoints2)
-            sign = ''
-            if ddif > 0:
-                sign = '+'
-            elif ddif < 0:
-                sign = '-'
-            print(f'Total demoman points on {mn}: {int(dpoints)}({sign}{abs(ddif)})')
+            diff_string = utils.points_delta_string(ddif, brackets=True)
+            print(f'Total demoman points on {mn}: {int(dpoints)} {diff_string}')
 
 
 def sgroups(args):
@@ -661,12 +624,7 @@ def stime(args, p=None, p2=None, silent=None, raw=None):
     old_pts = points.points(old_rank, old_completions)
     if new_completion:
         old_pts = 0
-    comp_pts = ' ('
-    if pts - old_pts > 0: 
-        comp_pts += '+'
-    comp_pts += str(int(pts - old_pts)) + ')'
-    if int(pts - old_pts) == 0:
-        comp_pts = ''
+    comp_pts = utils.points_delta_string(pts - old_pts, brackets=True)
 
     # Next group up split comparison
     comp_rank, comp_group = utils.get_group_trail(rank, completions)
@@ -688,7 +646,7 @@ def stime(args, p=None, p2=None, silent=None, raw=None):
             'points': int(pts),
             'comp_pts': comp_pts 
         }
-    print(f'{name} on {mn}: {group_str} @ {time_str} ({comp_group} +{comp_time}) | {rank}/{completions} | Points: {int(pts)}{comp_pts}')
+    print(f'{name} on {mn}: {group_str} @ {time_str} ({comp_group} +{comp_time}) | {rank}/{completions} | Points: {int(pts)} {comp_pts}')
 
 def dtime(args, p=None, p2=None, silent=None, raw=None):
     """dtime [tempusid] [map] | Displays a given player's demoman time on a map."""
@@ -736,12 +694,7 @@ def dtime(args, p=None, p2=None, silent=None, raw=None):
     old_pts = points.points(old_rank, old_completions)
     if new_completion:
         old_pts = 0
-    comp_pts = ' ('
-    if pts - old_pts > 0: 
-        comp_pts += '+'
-    comp_pts += str(int(pts - old_pts)) + ')'
-    if int(pts - old_pts) == 0:
-        comp_pts = ''
+    comp_pts = utils.points_delta_string(pts - old_pts, brackets=True)
 
     # Next group up split comparison
     comp_rank, comp_group = utils.get_group_trail(rank, completions)
@@ -764,7 +717,7 @@ def dtime(args, p=None, p2=None, silent=None, raw=None):
             'comp_pts': comp_pts 
         }
 
-    print(f'{name} on {mn}: {group_str} @ {time_str} ({comp_group} +{comp_time}) | {rank}/{completions} | Points: {int(pts)}{comp_pts}')
+    print(f'{name} on {mn}: {group_str} @ {time_str} ({comp_group} +{comp_time}) | {rank}/{completions} | Points: {int(pts)} {comp_pts}')
 
 def dtimeall(args):
     """dtimeall [tempusid] (group) | Displays all of a player's demoman times in the specified group, or all times if group is omitted."""
@@ -793,13 +746,13 @@ def dtimeall(args):
                 d = dtime((uid, run), p=p, p2=p2, silent=True, raw=True)
                 group_time_comp = f"{d['group_str']} @ {d['time_str']} ({d['comp_group']} +{d['comp_time']})"
                 rank_str = f"{d['rank']}/{d['completions']}"
-                print(f"{d['mapname'][:20]:20} | {group_time_comp:32} | {rank_str:9} | Points: {d['points']}{d['comp_pts']}")
+                print(f"{d['mapname'][:20]:20} | {group_time_comp:32} | {rank_str:9} | Points: {d['points']} {d['comp_pts']}")
 
         else:
             d = dtime((uid, run), p=p, p2=p2, silent=True, raw=True)
             group_time_comp = f"{d['group_str']} @ {d['time_str']} ({d['comp_group']} +{d['comp_time']})"
             rank_str = f"{d['rank']}/{d['completions']}"
-            print(f"{d['mapname'][:20]:20} | {group_time_comp:32} | {rank_str:9} | Points: {d['points']}{d['comp_pts']}")
+            print(f"{d['mapname'][:20]:20} | {group_time_comp:32} | {rank_str:9} | Points: {d['points']} {d['comp_pts']}")
 
 
 def stimeall(args):
@@ -829,12 +782,12 @@ def stimeall(args):
                 d = stime((uid, run), p=p, p2=p2, silent=True, raw=True)
                 group_time_comp = f"{d['group_str']} @ {d['time_str']} ({d['comp_group']} +{d['comp_time']})"
                 rank_str = f"{d['rank']}/{d['completions']}"
-                print(f"{d['mapname'][:20]:20} | {group_time_comp:32} | {rank_str:9} | Points: {d['points']}{d['comp_pts']}")
+                print(f"{d['mapname'][:20]:20} | {group_time_comp:32} | {rank_str:9} | Points: {d['points']} {d['comp_pts']}")
         else:
             d = stime((uid, run), p=p, p2=p2, silent=True, raw=True)
             group_time_comp = f"{d['group_str']} @ {d['time_str']} ({d['comp_group']} +{d['comp_time']})"
             rank_str = f"{d['rank']}/{d['completions']}"
-            print(f"{d['mapname'][:20]:20} | {group_time_comp:32} | {rank_str:9} | Points: {d['points']}{d['comp_pts']}")
+            print(f"{d['mapname'][:20]:20} | {group_time_comp:32} | {rank_str:9} | Points: {d['points']} {d['comp_pts']}")
 
 
 def id(args):

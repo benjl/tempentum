@@ -160,3 +160,40 @@ def get_group_trail(rank, completions):
         grouptrail = 10+groups[0]+groups[1]+groups[2]+groups[3]
     
     return (grouptrail, compstr)
+
+def rank_delta_string(rank_delta, brackets=None):
+    if brackets is None:
+        brackets = True
+    if rank_delta == 0:
+        return ''
+    rankdelta_string = ''
+    if rank_delta > 0:
+        if brackets:
+            rankdelta_string += '('
+        rankdelta_string += '↓'
+    elif rank_delta < 0:
+        if brackets:
+            rankdelta_string += '('
+        rankdelta_string += '↑'
+    rankdelta_string += str(abs(rank_delta))
+    if brackets:
+        rankdelta_string += ')'
+    return rankdelta_string
+
+def points_delta_string(points_delta, brackets=None):
+    if brackets is None:
+        brackets = True
+    if int(points_delta) == 0:
+        return ''
+    pointsdelta_string = ''
+    if points_delta > 0:
+        if brackets:
+            pointsdelta_string += '('
+        pointsdelta_string += '+'
+    elif points_delta < 0:
+        if brackets:
+            pointsdelta_string += '('
+    pointsdelta_string += str(int(points_delta))
+    if brackets:
+        pointsdelta_string += ')'
+    return pointsdelta_string
