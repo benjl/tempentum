@@ -3,14 +3,12 @@ import points
 import profiles
 import map_getter
 
-def help(args):
-    print("""download all: downloads tempus data from the internet
-update: calculate points
-rankall: generate leaderboards file""")
-
 def stimes(args):
+    """stimes [map] ((start-)end)/groupname
+    Prints the specified range of times on the map. Example: stimes beef 40-50 | Prints ranks 40 to 50 on jump_beef.
+    Can also print the top of the specified group. Example: stimes beef g3 | Prints the top 50 times in group 3."""
     if len(args) == 0:
-        print('USAGE: stimes [map] ((start-)end)')
+        print('No arguments specified.')
         return
     mn = utils.find_map(args[0])
     if mn is None:
@@ -25,7 +23,7 @@ def stimes(args):
     if len(args) > 1:
         if '-' in args[1]:
             if len(args[1].split('-')) != 2:
-                print('USAGE: stimes [map] ((start-)end)/(groupname)')
+                print('Invalid syntax.')
                 return
             start,end = args[1].split('-')
             try:
@@ -63,6 +61,9 @@ def stimes(args):
         print(f"#{c['rank']:{len(str(end))}}: {clipped_name:13} {c['group_str']} @ {c['time_str']} ({c['comp_group']} +{c['comp_time']}) - {c['points']} points")
 
 def dtimes(args):
+    """dtimes [map] ((start-)end)/groupname
+    Prints the specified range of times on the map. Example: dtimes aando 40-50 | Prints ranks 40 to 50 on jump_aando.
+    Can also print the top of the specified group. Example: dtimes aando g3 | Prints the top 50 times in Group 3."""
     if len(args) == 0:
         print('USAGE: dtimes [map] ((start-)end)/(groupname)')
         return
@@ -117,8 +118,13 @@ def dtimes(args):
         print(f"#{c['rank']:{len(str(end))}}: {clipped_name:13} {c['group_str']} @ {c['time_str']} ({c['comp_group']} +{c['comp_time']}) - {c['points']} points")
 
 def download(args):
+    """download [map/all] (start)
+    download all | Downloads map data for every map on tempus.
+    download all 266 | Downloads map data for every map on tempus, excluding the first 265 maps in the maplist.
+    download map | Downloads map data for a specific map.
+    Use update to calculate points and ranks based on downloaded map data."""
     if len(args) == 0:
-        print('USAGE: download [map/all] (start)')
+        print('No arguments specified.')
         return
     else:
         mn = args[0]
@@ -140,11 +146,15 @@ def download(args):
             map_getter.download_map(mn)
         
 def maplist(args):
+    """maplist | Updates the maplist from tempus."""
     print('Updating map list...')
     utils.fetch_current_maplist()
     print('Map list updated.')
     
 def srank(args):
+    """srank [tempusid/#rank]
+    srank 1137 | Shows the soldier rank of the player with the tempus id 1137. Use the id command to find the id for a given player name.
+    srank #30 | Shows who the rank 30 soldier is."""
     if len(args) != 1:
         print('USAGE: srank [tempusid/#rank]')
     else:
@@ -207,6 +217,9 @@ def srank(args):
         print(f'{name}: Rank {rank} soldier{rankdelta_string} | {int(pts)} points {pointsdelta_string}')
 
 def drank(args):
+    """drank [tempusid/#rank]
+    drank 1137 | Shows the demoman rank of the player with the tempus id 1137. Use the id command to find the id for a given player name.
+    drank #30 | Shows who the rank 30 demoman is."""
     if len(args) != 1:
         print('USAGE: drank [tempusid/#rank]')
     else:
@@ -254,7 +267,7 @@ def drank(args):
             rankdelta_string = ''
         else:
             rankdelta_string += str(abs(rankdelta)) + ')'
-        
+
         pointsdelta = pts - oldpts
         pointsdelta_string = ''
         if pointsdelta > 0:
@@ -265,10 +278,12 @@ def drank(args):
             pointsdelta_string = ''
         else:
             pointsdelta_string += str(int(pointsdelta)) + ')'
-        
+
         print(f'{name}: Rank {rank} demoman{rankdelta_string} | {int(pts)} points {pointsdelta_string}')
 
 def dgainers(args):
+    """dgainers (n) | Shows the top n players by demoman points gained since last update. Defaults to 10 if n is omitted."""
+
     if len(args) == 0:
         n = 10
     else:
@@ -333,6 +348,7 @@ def dgainers(args):
             print(f'{name}: Rank {rank} demoman {rank_delta_string} | {int(points)} points ({points_delta_string})')
 
 def sgainers(args):
+    """sgainers (n) | Shows the top n players by soldier points gained since last update. Defaults to 10 if n is omitted."""
     if len(args) == 0:
         n = 10
     else:
@@ -397,6 +413,7 @@ def sgainers(args):
             print(f'{name}: Rank {rank} soldier {rank_delta_string} | {int(points)} points ({points_delta_string})')
 
 def leaderboards(args):
+    """leaderboards | Outputs the complete leaderboards for soldier and demoman to txt files in the soldier_ranks and demoman_ranks folders."""
     print('Generating leaderboards...')
     cur_date = utils.get_current_date()
     p = utils.get_latest_profiles()
@@ -453,6 +470,7 @@ def leaderboards(args):
                     f.write(f'{rank}. {name}: {int(points)} points ({points_delta_string}) {rank_delta_string}\n')
 
 def pts(args):
+    """pts (mapname) | Displays the total number of points that have been earned on a given map, or all maps combined if mapname is omitted."""
     if len(args) == 0:
         p = utils.get_latest_profiles()
         p2 = utils.get_latest_profiles(x=1)
@@ -519,6 +537,7 @@ def pts(args):
 
 
 def sgroups(args):
+    """sgroups [tempusid] | Shows how many soldier times in each group a player has."""
     if len(args) != 1:
         print('USAGE: sgroups [tempusid]')
         return
@@ -557,6 +576,7 @@ def sgroups(args):
     NG: {groups[6]}({groupspct[6]}%)({int(groupspts[6])} pts)""")
     
 def dgroups(args):
+    """dgroups [tempusid] | Shows how many demoman times in each group a player has."""
     if len(args) != 1:
         print('USAGE: dgroups [tempusid]')
         return
@@ -595,6 +615,7 @@ def dgroups(args):
     NG: {groups[6]}({groupspct[6]}%)({int(groupspts[6])} pts)""")
 
 def stime(args, p=None, p2=None, silent=None, raw=None):
+    """stime [tempusid] [map] | Displays a given player's soldier time on a map."""
     raw = False if raw is None else raw
     silent = False if silent is None else silent
     if len(args) < 2:
@@ -670,6 +691,7 @@ def stime(args, p=None, p2=None, silent=None, raw=None):
     print(f'{name} on {mn}: {group_str} @ {time_str} ({comp_group} +{comp_time}) | {rank}/{completions} | Points: {int(pts)}{comp_pts}')
 
 def dtime(args, p=None, p2=None, silent=None, raw=None):
+    """dtime [tempusid] [map] | Displays a given player's demoman time on a map."""
     raw = False if raw is None else raw
     silent = False if silent is None else silent
     if len(args) < 2:
@@ -743,8 +765,12 @@ def dtime(args, p=None, p2=None, silent=None, raw=None):
         }
 
     print(f'{name} on {mn}: {group_str} @ {time_str} ({comp_group} +{comp_time}) | {rank}/{completions} | Points: {int(pts)}{comp_pts}')
-    
+
 def dtimeall(args):
+    """dtimeall [tempusid] (group) | Displays all of a player's demoman times in the specified group, or all times if group is omitted."""
+    if len(args) == 0:
+        print('Invalid number of arguments.')
+        return
     uid = args[0]
     groupname = None
     if len(args) > 1:
@@ -777,6 +803,10 @@ def dtimeall(args):
 
 
 def stimeall(args):
+    """stimeall [tempusid] (group) | Displays all of a player's soldier times in the specified group, or all times if group is omitted."""
+    if len(args) == 0:
+        print('Invalid number of arguments.')
+        return
     uid = args[0]
     groupname = None
     if len(args) > 1:
@@ -808,6 +838,7 @@ def stimeall(args):
 
 
 def id(args):
+    """id [name] | Displays all players that match the searched name and their tempus id."""
     if len(args) < 1:
         print('USAGE: id [playername]')
         return
@@ -816,7 +847,9 @@ def id(args):
     for id in p:
         if p[id]['name'].lower().startswith(name.lower()):
             print(f'{p[id]["name"]}: {id}')
+
 def update(args):
+    """update | Calculates points and rankings for each player from the downloaded map data."""
     print('Updating tempus data...')
     profiles.build_profiles()
     print('Tempus data updated.')
