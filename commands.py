@@ -806,7 +806,17 @@ def id(args):
             print(f'{p[id]["name"]}: {id}')
 
 def update(args):
-    """update | Calculates points and rankings for each player from the downloaded map data."""
-    print('Updating tempus data...')
-    profiles.build_profiles()
-    print('Tempus data updated.')
+    """update (mapname) | Calculates points and rankings for each player from the downloaded map data.
+    Optional mapname argument will only recalculate points for the given map."""
+    if len(args) > 0:
+        mn = utils.find_map(args[0])
+        if mn is None:
+            print('Map not found.')
+            return
+        print(f'Updating {mn} points data...')
+        profiles.update_profiles(mn)
+        print('Tempus data updated.')
+    else:
+        print('Updating all profiles...')
+        profiles.build_profiles()
+        print('Tempus data updated.')
