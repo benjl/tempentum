@@ -55,8 +55,9 @@ def stimes(args):
         return
     print(f'Runs #{start}-{end} on {mn}:')
     p = utils.get_latest_profiles()
+    md = utils.get_latest_map_data(mn)
     for x in range(start-1,end):
-        c = stime([f"{data['results']['soldier'][x]['player_info']['id']}", mn], p=p, p2=p, silent=True, raw=True)
+        c = stime([f"{data['results']['soldier'][x]['player_info']['id']}", mn], p=p, p2=p, silent=True, raw=True, md=md)
         clipped_name = c['name'][:12]
         print(f"#{c['rank']:{len(str(end))}}: {clipped_name:13} {c['group_str']} @ {c['time_str']} ({c['comp_group']} +{c['comp_time']}) - {c['points']} points")
 
@@ -112,8 +113,9 @@ def dtimes(args):
         return
     print(f'Runs #{start}-{end} on {mn}:')
     p = utils.get_latest_profiles()
+    md = utils.get_latest_map_data(mn)
     for x in range(start-1,end):
-        c = dtime([f"{data['results']['demoman'][x]['player_info']['id']}", mn], p=p, p2=p, silent=True, raw=True)
+        c = dtime([f"{data['results']['demoman'][x]['player_info']['id']}", mn], p=p, p2=p, silent=True, raw=True, md=md)
         clipped_name = c['name'][:12]
         print(f"#{c['rank']:{len(str(end))}}: {clipped_name:13} {c['group_str']} @ {c['time_str']} ({c['comp_group']} +{c['comp_time']}) - {c['points']} points")
 
@@ -577,7 +579,7 @@ def dgroups(args):
     G4: {groups[5]}({groupspct[5]}%)({int(groupspts[5])} pts)
     NG: {groups[6]}({groupspct[6]}%)({int(groupspts[6])} pts)""")
 
-def stime(args, p=None, p2=None, silent=None, raw=None):
+def stime(args, p=None, p2=None, silent=None, raw=None, md=None):
     """stime [tempusid] [map] | Displays a given player's soldier time on a map."""
     raw = False if raw is None else raw
     silent = False if silent is None else silent
@@ -628,7 +630,8 @@ def stime(args, p=None, p2=None, silent=None, raw=None):
 
     # Next group up split comparison
     comp_rank, comp_group = utils.get_group_trail(rank, completions)
-    md = utils.get_latest_map_data(mn, x=0)
+    if md is None:
+        md = utils.get_latest_map_data(mn, x=0)
     if md is not None:
         comp_time = utils.tempus_timestring(run['duration'] - md['results']['soldier'][comp_rank - 1]['duration'])
     else:
@@ -648,7 +651,7 @@ def stime(args, p=None, p2=None, silent=None, raw=None):
         }
     print(f'{name} on {mn}: {group_str} @ {time_str} ({comp_group} +{comp_time}) | {rank}/{completions} | Points: {int(pts)} {comp_pts}')
 
-def dtime(args, p=None, p2=None, silent=None, raw=None):
+def dtime(args, p=None, p2=None, silent=None, raw=None, md=None):
     """dtime [tempusid] [map] | Displays a given player's demoman time on a map."""
     raw = False if raw is None else raw
     silent = False if silent is None else silent
@@ -698,7 +701,8 @@ def dtime(args, p=None, p2=None, silent=None, raw=None):
 
     # Next group up split comparison
     comp_rank, comp_group = utils.get_group_trail(rank, completions)
-    md = utils.get_latest_map_data(mn, x=0)
+    if md is None:
+        md = utils.get_latest_map_data(mn, x=0)
     if md is not None:
         comp_time = utils.tempus_timestring(run['duration'] - md['results']['demoman'][comp_rank - 1]['duration'])
     else:
