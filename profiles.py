@@ -12,9 +12,9 @@ def build_profiles():
         maplist = utils.load_maplist()
         d_maps = utils.get_demoman_maps()
         s_maps = utils.get_soldier_maps()
-        
+        total_maps = len(maplist)
         # First we go through each run on each map and add it to the person's profile
-        for mn in maplist:
+        for i, mn in enumerate(maplist):
             data = utils.get_latest_map_data(mn)
             if data is None:
                 continue
@@ -39,6 +39,8 @@ def build_profiles():
                     profiles[id]['runs'][classname][mn]['rank'] = run['rank']
                     profiles[id]['runs'][classname][mn]['completions'] = data['completion_info'][classname]
                     profiles[id]['points'][classname] += points.points(run['rank'], data['completion_info'][classname])
+            if i % (total_maps // 10) == 1:
+                print(f'{round(i/total_maps*100)}%...')
         
         # Then we rank every player based on their points
         ids = profiles.keys()
@@ -54,7 +56,6 @@ def build_profiles():
             profiles[plr_id]['rank']['soldier'] = rank
             if profiles[plr_id]['points']['soldier'] == 0:
                 profiles[plr_id]['rank']['soldier'] = -1
-        
         
         with open(f'internal/profiles/{cur_date}.json', 'w') as f:
             json.dump(profiles, f)
