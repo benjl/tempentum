@@ -277,3 +277,7 @@ jump_lilith
 jump_rust_rc3
 conc_concept
 jump_causatham_rc5
+jump_cabal_b6
+jump_galaktikon_b2
+jump_kjr_a16
+jump_primary_rc1
