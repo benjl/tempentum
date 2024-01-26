@@ -91,11 +91,11 @@ def update_profiles(mapname): # Updates a single map in the profiles
             id = str(run['user_id'])
             if id not in p:
                 p[id] = {}
-                p[id]['name'] = run['name'].replace('\n',' ')
                 p[id]['rank'] = {'soldier': -1, 'demoman': -1}
                 p[id]['points'] = {'soldier': 0, 'demoman': 0}
                 p[id]['runs'] = {'soldier': {}, 'demoman': {}}
 
+            p[id]['name'] = run['name'].replace('\n',' ')
             p[id]['runs'][classname][mapname] = {}
             p[id]['runs'][classname][mapname]['duration'] = run['duration']
             p[id]['runs'][classname][mapname]['rank'] = run['rank']
