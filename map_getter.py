@@ -43,7 +43,7 @@ def download_all_maps(idx=0):
             status = download_map(mn, silent=True)
             if not status:
                 failed.append(mn)
-                print(f'{i}/{mapcount} Maps Downloaded (FAILED)')
+                print(f'{i}/{mapcount} Maps Downloaded ({mn} FAILED)')
             else:
                 print(f'{i}/{mapcount} Maps Downloaded ({mn})')
         except KeyboardInterrupt:
@@ -56,3 +56,6 @@ def download_all_maps(idx=0):
     for mapn in maplist:
         if mapn not in s_maps and mapn not in d_maps:
             print(f'WARNING: {mapn} is not assigned as soldier or demo map.')
+    for mapn in s_maps + d_maps:
+        if mapn not in maplist and (mapn in s_maps or mapn in d_maps):
+            print(f'WARNING: {mapn} is assigned as a demo or soldier map, but is not on tempus.')

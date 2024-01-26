@@ -9,7 +9,6 @@ jump_acepogo
 jump_aggregate_zip
 jump_aigis_a4
 jump_airships_v2
-jump_allstars
 jump_annex_v5
 jump_ante
 jump_apex_b1
@@ -391,7 +390,6 @@ jump_diamant_rc5
 jump_escape_rc4
 jump_flood
 jump_oddie_a4
-jump_power_rc1
 jump_sampi_rc5
 jump_waltz_rc6
 jump_alienvspredator_v3
@@ -412,7 +410,6 @@ jump_nefarious_final
 jump_omega_redo_v2
 jump_outmywindow_finallly
 jump_ozone
-jump_passion_fix
 jump_plunder_final
 jump_power_rc3
 jump_primal_rc7
@@ -429,12 +426,10 @@ jump_allstars_fix
 jump_arcane_final
 jump_attached3_final
 jump_avalanche
-jump_beryllium_v4
 jump_boogiewoogie_a29
 jump_desolate_rc6
 jump_ember_rc6
 jump_factory
-jump_hopstep2_rc6
 jump_ideation_b5
 jump_illuminum_tmps
 jump_mazzo
@@ -446,7 +441,6 @@ jump_repente2_fix
 jump_reverentia_rc2
 jump_rex_final
 jump_soquete
-jump_spy101_rc4
 jump_umon_rc2
 jump_uranium_v5
 jump_ursprung_final
@@ -462,7 +456,6 @@ jump_infernum_rc2
 jump_inimica_rc2
 jump_ionizer_tpn4
 jump_laevateinn_final
-jump_ravioliix
 jump_wagyu_a5
 jump_whitescreen_b1
 jump_balls_fix

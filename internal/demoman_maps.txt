@@ -235,7 +235,6 @@ jump_yes_b4
 jump_
 jump_alienvspredator_v3
 jump_authn_b6
-jump_drenched2_v5
 jump_gervais_v3
 jump_ipos
 jump_justroll_b1
@@ -264,7 +263,6 @@ jump_celeriix
 jump_illuminum_tmps
 jump_mutegod
 jump_shapes_rc2
-jump_spy101_rc4
 jump_timtam_rc2
 jump_insomnia_a8
 jump_achlys
