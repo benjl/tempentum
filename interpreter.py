@@ -18,7 +18,7 @@ COMMANDS = {'download': commands.download, 'srank': commands.srank, 'drank': com
             'dtimeall': commands.dtimeall, 'stimeall': commands.stimeall,
             'sgroups': commands.sgroups, 'dgroups': commands.dgroups, 'id': commands.id,
             'stimes': commands.stimes, 'dtimes': commands.dtimes, 'sgainers': commands.sgainers,
-            'dgainers': commands.dgainers, 'help': helpcmd}
+            'dgainers': commands.dgainers, 'help': helpcmd, 'noobs': commands.newplayers}
 
 if __name__ == '__main__':
     print('Tempentum Point System')

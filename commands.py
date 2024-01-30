@@ -820,3 +820,39 @@ def update(args):
         print('Updating all profiles...')
         profiles.build_profiles()
         print('Tempus data updated.')
+
+def newplayers(args):
+    """newplayers | Lists players that got their first run since last data"""
+    p = utils.get_latest_profiles()
+    p2 = utils.get_latest_profiles(x=1)
+    if p2 is None:
+        print('Error: No past data, everyone is a new player.')
+        return
+    newbies = []
+    for pid in p:
+        if pid not in p2:
+            newbies.append(pid)
+    if len(newbies) == 0:
+        print('No new players since last time.')
+        return
+    newsoldiers = 0
+    newdemos = 0
+    for pid in newbies:
+        if p[pid]['rank']['demoman'] != -1:
+            newdemos += 1
+        if p[pid]['rank']['soldier'] != -1:
+            newsoldiers += 1
+    print(f'{len(newbies)} new players since {utils.get_latest_profile_date(x=1)}:')
+    print(f'({newsoldiers} soldiers, {newdemos} demos)')
+    for pid in sorted(newbies, key=lambda x: p[x]['points']['soldier'] + p[x]['points']['demoman'], reverse=True):
+        name = p[pid]['name']
+        drank = p[pid]['rank']['demoman']
+        dpoints = int(p[pid]['points']['demoman'])
+        srank = p[pid]['rank']['soldier']
+        spoints = int(p[pid]['points']['soldier'])
+        if drank != -1 and srank != -1:
+            print(f'{name} ({pid}) | Rank {srank} soldier ({spoints} pts) | Rank {drank} demoman ({dpoints} pts)')
+        elif drank != -1:
+            print(f'{name} ({pid}) | Rank {drank} demoman ({dpoints} pts)')
+        elif srank != -1:
+            print(f'{name} ({pid}) | Rank {srank} soldier ({spoints} pts)')
