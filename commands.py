@@ -801,9 +801,15 @@ def id(args):
         return
     name = ' '.join(args)
     p = utils.get_latest_profiles()
+    foundids = []
     for id in p:
-        if p[id]['name'].lower().startswith(name.lower()):
-            print(f'{p[id]["name"]}: {id}')
+        if p[id]['name'].lower().startswith(name.lower()) and id not in foundids:
+            foundids.append(id)
+    for id in p:
+        if name.lower() in p[id]['name'].lower() and id not in foundids:
+            foundids.append(id)
+    for id in foundids[:50]:
+        print(f'{p[id]["name"]}: {id}')
 
 def update(args):
     """update (mapname) | Calculates points and rankings for each player from the downloaded map data.
