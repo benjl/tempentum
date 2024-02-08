@@ -392,7 +392,6 @@ jump_flood
 jump_oddie_a4
 jump_sampi_rc5
 jump_waltz_rc6
-jump_alienvspredator_v3
 jump_apparition
 jump_back_v3
 jump_corona_v2
